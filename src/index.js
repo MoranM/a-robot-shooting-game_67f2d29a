@@ -1,6 +1,7 @@
+import * as THREE from 'three';
 import { Game } from './game.js';
 
-window.onload = () => {
-    const game = new Game();
-    game.start();
-};
+document.addEventListener('DOMContentLoaded', () => {
+  const game = new Game();
+  game.start();
+});
