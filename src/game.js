@@ -1,54 +1,32 @@
 import * as THREE from 'three';
-import { createCamera } from './components/camera.js';
-import { createRenderer } from './components/renderer.js';
-import { createLights } from './components/lights.js';
-import { createControls } from './components/controls.js';
-import { createPlayer } from './entities/player.js';
-import { createEnemy } from './entities/enemy.js';
-import { createEnvironment } from './entities/environment.js';
-import { updatePhysics } from './systems/physics.js';
-import { checkCollisions } from './systems/collision.js';
 
-class Game {
-    constructor() {
-        this.scene = new THREE.Scene();
-        this.camera = createCamera();
-        this.renderer = createRenderer();
-        this.controls = createControls(this.camera, this.renderer);
+export class Game {
+  constructor() {
+    this.scene = new THREE.Scene();
+    this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    this.renderer = new THREE.WebGLRenderer();
+    this.renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(this.renderer.domElement);
+    this.createPlayer();
+    this.animate();
+  }
 
-        createLights(this.scene);
+  createPlayer() {
+    const geometry = new THREE.BoxGeometry();
+    const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+    this.player = new THREE.Mesh(geometry, material);
+    this.scene.add(this.player);
+    this.camera.position.z = 5;
+  }
 
-        this.player = createPlayer();
-        this.scene.add(this.player);
+  animate() {
+    requestAnimationFrame(() => this.animate());
+    this.player.rotation.x += 0.01;
+    this.player.rotation.y += 0.01;
+    this.renderer.render(this.scene, this.camera);
+  }
 
-        this.enemies = [createEnemy()];
-        this.enemies.forEach(enemy => this.scene.add(enemy));
-
-        this.environment = createEnvironment();
-        this.scene.add(this.environment);
-
-        this.clock = new THREE.Clock();
-    }
-
-    update() {
-        const deltaTime = this.clock.getDelta();
-        updatePhysics(this.player, deltaTime);
-        checkCollisions(this.player, this.enemies);
-        this.controls.update(deltaTime);
-    }
-
-    render() {
-        this.renderer.render(this.scene, this.camera);
-    }
-
-    start() {
-        const animate = () => {
-            requestAnimationFrame(animate);
-            this.update();
-            this.render();
-        };
-        animate();
-    }
+  start() {
+    // Additional start logic if needed
+  }
 }
-
-export { Game };
